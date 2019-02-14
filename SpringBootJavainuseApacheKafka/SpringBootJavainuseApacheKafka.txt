@@ -1,0 +1,208 @@
+SpringBootJavainuseApacheKafka
+
+Add dependency
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+
+Create service KafkaSender
+@Service
+public class KafkaSender {
+	
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+	
+	String kafkaTopic = "java_in_use_topic";
+	
+	public void send(String message) {
+	    
+	    kafkaTemplate.send(kafkaTopic, message);
+	}
+}
+
+Create Controller
+@RestController
+@RequestMapping(value = "/javainuse-kafka/")
+public class ApacheKafkaWebController {
+
+	@Autowired
+	KafkaSender kafkaSender;
+
+	@GetMapping(value = "/producer")
+	public String producer(@RequestParam("message") String message) {
+		kafkaSender.send(message);
+
+		return "Message sent to the Kafka Topic java_in_use_topic Successfully";
+	}
+
+}
+
+Create main class
+
+We are done with the required Java code
+Start Apache Zookeeper-
+C:\kafka_2.12-0.10.2.1>.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+Start Apache Kafka
+C:\kafka_2.12-0.10.2.1>.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+ext start the Spring Boot Application by running it as a Java Application.
+Also Start the consumer listening to the java_in_use_topic-
+C:\kafka_2.12-0.10.2.1>.\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic java_in_use_topic --from-beginning
+
+Finally hit the url as follows- http://localhost:8080//javainuse-kafka/producer?message=test 
+get the message "Message sent to the Kafka Topic soumyadeep_topic Successfully"
+
+This will trigger the message to be sent to the java_in_use_topic. We can see in the consumer started the message is recieved. 
+
+
+Spring Boot + Apache Kafka Hello World Example
+In this post we will integrate Spring Boot and Apache Kafka instance.
+In a previous post we had seen how to get Apache Kafka up and running. 
+
+Spring Boot Apache Kafka Tutorial 
+Video
+
+This tutorial is explained in the below Youtube Video.
+
+
+Lets Begin-
+
+The project will be as follows-
+Define the pom.xml as follows- Add the spring-kafka dependency.
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.javainuse</groupId>
+  <artifactId>SpringBootApacheKafkaHelloWorld</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <packaging>jar</packaging>
+
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.3.RELEASE</version>
+		<relativePath/>
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+  
+</project>
+
+
+ 
+Define the KafkaSender class to send message to the kafka topic named as java_in_use-topic.
+package com.javainuse.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+public class KafkaSender {
+	
+	@Autowired
+	private KafkaTemplate<String, String> kafkaTemplate;
+	
+	String kafkaTopic = "java_in_use_topic";
+	
+	public void send(String message) {
+	    
+	    kafkaTemplate.send(kafkaTopic, message);
+	}
+}
+Define a Controller which will pass the message and trigger the send message to the Kafka Topic using the KafkaSender class.
+package com.javainuse.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.javainuse.service.KafkaSender;
+
+@RestController
+@RequestMapping(value = "/javainuse-kafka/")
+public class ApacheKafkaWebController {
+
+	@Autowired
+	KafkaSender kafkaSender;
+
+	@GetMapping(value = "/producer")
+	public String producer(@RequestParam("message") String message) {
+		kafkaSender.send(message);
+
+		return "Message sent to the Kafka Topic java_in_use_topic Successfully";
+	}
+
+}
+Finally Define the Spring Boot Class with @SpringBootApplication annotation
+package com.javainuse;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SpringBootHelloWorldApplication {
+
+	public static void main(String[] args) {
+
+		SpringApplication.run(
+				new Object[] { SpringBootHelloWorldApplication.class }, args);
+	}
+}
+
+We are done with the required Java code. Now lets start Apache Kafka. As we had explained in detail in the Getting started with Apache Kafka perform the following.
+Start Apache Zookeeper-
+C:\kafka_2.12-0.10.2.1>.\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
+
+Spring Boot Apache Zookeeper
+Start Apache Kafka-
+C:\kafka_2.12-0.10.2.1>.\bin\windows\kafka-server-start.bat .\config\server.properties
+
+Spring Boot Apache Kafka
+Next start the Spring Boot Application by running it as a Java Application.
+Also Start the consumer listening to the java_in_use_topic-
+C:\kafka_2.12-0.10.2.1>.\bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic java_in_use_topic --from-beginning
+
+Spring Boot Apache Kafka Example 
+Finally hit the url as follows- http://localhost:8080//javainuse-kafka/producer?message=test 
+Spring Boot Apache Kafka Topic 
+This will trigger the message to be sent to the java_in_use_topic. We can see in the consumer started the message is recieved. 
+Spring Boot Apache Kafka Consume
+Download Source Code
+Download it -
+Spring Boot + Apache Kafka Hello World Example
